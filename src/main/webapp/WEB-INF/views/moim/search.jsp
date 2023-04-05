@@ -36,13 +36,12 @@
 						<a href="/user/login">로그인</a>
 					</div>
 				</div>
-
 			</c:otherwise>
 		</c:choose>
-	</div>
-		
-<%-- 메인 / 검색창 및 검색 결과 뷰 --%>
+
+		<c:set var="joinedCate" value="${fn:join(paramValues.cate, '&') }" />
 		<div style="flex: 1; min-width: 95vw; margin-top: 20px" class="block">
+			<%-- 검색창 렌더링 영역 --%>
 			<form class="block-row" style="align-items: center;"
 				action="/moim/search">
 				<div style="flex: 1" class="block-row">
@@ -50,7 +49,9 @@
 						varStatus="vs">
 						<div>
 							<input name="cate" type="checkbox" value="${one }"
-								id="cate${vs.count }"  ${fn:contains(joinedCate, one ) ? 'checked' :'' } /><label for="cate${vs.count }" >${one }</label>
+								id="cate${vs.count }"
+								${fn:contains(joinedCate, one ) ? 'checked' :'' } /><label
+								for="cate${vs.count }">${one }</label>
 						</div>
 					</c:forTokens>
 				</div>
@@ -61,11 +62,14 @@
 					<button style="flex: 1">검색</button>
 				</div>
 			</form>
-			<div style="flex: 1" class="block-row">
+			<%-- 모임 정보 렌더링 영역 --%>
+			<div class="block-row">
 				<c:forEach items="${list }" var="moim">
-					<div class="moim-detail-card block">
+					<div class="moim-detail-card block"
+						onclick="location.href='/moim/detail?id=${moim.id}'">
 						<div>
-							<span style="color: blue">[ ${moim.type eq 'public' ? '공개':'비공개' } / ${moim.cate }]</span>&nbsp;
+							<span style="color: hotpink">[ ${moim.type eq 'public' ? '공개':'비공개' }
+								/ ${moim.cate }]</span>&nbsp;
 							<c:choose>
 								<c:when test="${fn:length(moim.event) gt 16}">
 									${fn:substring(moim.event, 0,16) }...
@@ -87,13 +91,32 @@
 									pattern="#,###" />
 							</span>
 						</div>
-						<div style="text-align: left">
+						<div style="text-align: left; overflow: hidden">
 							# 소개 : <span>${moim.description }</span>
 						</div>
 					</div>
-
 				</c:forEach>
 			</div>
+			<%-- 페이지 링크 뷰 영역 --%>
+			<div>
+				<c:if test="${existPrev }">
+				<a href="">≪</a>
+				</c:if>
+				<c:forEach var="p" begin="${start }" end="${last }">
+					<c:choose>
+						<c:when test="${p eq param.page }">
+							<b style="color: green">${p }</b>
+						</c:when>
+						<c:otherwise>
+							<a href="/moim/search?page=${p }">${p }</a>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+				<c:if test="${existNext }">
+					<a href="">≫</a>
+				</c:if>
+			</div>
 		</div>
+	</div>
 </body>
 </html>
